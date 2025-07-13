@@ -1,27 +1,21 @@
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import todoRoute from "./Routes/todo.route.js";
 import userRoute from "./Routes/user.route.js";
-import cors from "cors";
 import cookieParser from "cookie-parser";
+import companyRoute from "./Routes/company.route.js";
+import connectCloudinary from "./cloudnary.js";
 
 const app = express();
 dotenv.config();
+
+connectCloudinary(); // Connect to Cloudinary for image upload
 
 const port = process.env.PORT || 3000;
 const uri = process.env.URI || "mongodb://localhost:27017/TODO-App";
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-    methods: "GET, POST, PUT, DELETE",
-    allowedHeaders: "Content-Type, Authorization",
-  })
-);
 try {
   await mongoose.connect(uri);
   console.log("Connected to MongoDB");
@@ -30,7 +24,7 @@ try {
 }
 
 app.use("/users", userRoute);
-app.use("/todos", todoRoute);
+app.use("/companies", companyRoute);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

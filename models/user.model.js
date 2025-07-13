@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  resume: {
+    type: String,
+    default: "",
+  },
   token: {
     type: String,
   },

@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import { genrateToken } from "../jwt/token.js";
-
+import { v2 as Cloudinary } from "cloudinary";
 const userSchema = z.object({
   username: z
     .string()
@@ -86,6 +86,25 @@ const userLogout = (req, res) => {
     res.status(201).json({ message: "user logged out successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error logging out user" });
+  }
+};
+export const updateResume = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const resumeFile = req.resumeFile;
+    if (!resumeFile) {
+      return res.status(400).json({ message: "Resume is required" });
+    }
+    const userData = await User.findById(userId);
+    if (resumeFile) {
+      const resumeUpload = await Cloudinary.uploader.upload(resumeFile.path);
+      userData.resume = resumeUpload.secure_url;
+    }
+    await userData.save();
+    return res.status(200).json({ message: "resume uploaded" });
+  } catch (error) {
+    console.error("Error updating resume:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 export { userLogin, userLogout };
